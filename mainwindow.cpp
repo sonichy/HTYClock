@@ -8,12 +8,14 @@
 #include <QDebug>
 #include <QAction>
 #include <QShortcut>
+#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
       settings(QCoreApplication::organizationName(), QCoreApplication::applicationName())
 {
     isMLBD = false;
+    path = ".";
     int width = settings.value("width").toInt();
     if(width == 0) width = 200;
     int height = settings.value("height").toInt();
@@ -41,6 +43,9 @@ MainWindow::MainWindow(QWidget *parent)
     action_showInTaskbar->setCheckable(true);
     connect(action_showInTaskbar, SIGNAL(toggled(bool)), this, SLOT(showInTaskbar(bool)));
     addAction(action_showInTaskbar);
+    QAction *action_capture = new QAction("截图", this);
+    connect(action_capture, SIGNAL(triggered(bool)), this, SLOT(capture()));
+    addAction(action_capture);
     setContextMenuPolicy(Qt::ActionsContextMenu);
 
     if(settings.value("onTop").toInt() == 1) {
@@ -209,4 +214,10 @@ void MainWindow::zoom1()
     setFixedSize(200,200);
     settings.setValue("width", width());
     settings.setValue("height", height());
+}
+
+void MainWindow::capture()
+{
+    path = QFileDialog::getExistingDirectory(this, "保存路径", path, QFileDialog::ShowDirsOnly |QFileDialog::DontResolveSymlinks);
+    label->pixmap()->save(path + "/" + QCoreApplication::applicationName() + ".png");
 }

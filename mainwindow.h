@@ -19,6 +19,7 @@ protected:
 
 private:
     bool isMLBD;
+    QString path;
     QLabel *label;
     QPoint m_point;
     QSettings settings;
@@ -34,6 +35,7 @@ private slots:
     void zoomIn();
     void zoomOut();
     void zoom1();
+    void capture();
 
 };
 
