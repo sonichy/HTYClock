@@ -32,21 +32,29 @@ MainWindow::MainWindow(QWidget *parent)
     connect(timer, SIGNAL(timeout()), this, SLOT(draw()));
     timer->start(1000);
 
-    QAction *action_quit = new QAction("退出", this);
-    connect(action_quit, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
+    QAction *action_quit = new QAction("&Quit", this);
+    action_quit->setShortcut(QKeySequence::Quit);
+    connect(action_quit, SIGNAL(triggered(bool)), this, SLOT(close()));
     addAction(action_quit);
-    QAction *action_onTop = new QAction("顶置", this);
+    QAction *action_onTop = new QAction("On &top", this);
+    action_onTop->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_T));
     action_onTop->setCheckable(true);
     connect(action_onTop, SIGNAL(toggled(bool)), this, SLOT(onTop(bool)));
     addAction(action_onTop);
-    QAction *action_showInTaskbar = new QAction("任务栏显示", this);
+    QAction *action_showInTaskbar = new QAction("Show in task&bar", this);
+    action_showInTaskbar->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_B));
     action_showInTaskbar->setCheckable(true);
     connect(action_showInTaskbar, SIGNAL(toggled(bool)), this, SLOT(showInTaskbar(bool)));
     addAction(action_showInTaskbar);
-    QAction *action_capture = new QAction("截图", this);
+    QAction *action_capture = new QAction("&Capture", this);
+    action_capture->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_C));
     connect(action_capture, SIGNAL(triggered(bool)), this, SLOT(capture()));
     addAction(action_capture);
     setContextMenuPolicy(Qt::ActionsContextMenu);
+
+    foreach(QAction *action, actions()){
+        action->setShortcutVisibleInContextMenu(true);
+    }
 
     if(settings.value("onTop").toInt() == 1) {
         action_onTop->setChecked(true);
@@ -159,8 +167,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void MainWindow::readSettings()
 {
     QSettings settings(QCoreApplication::organizationName(), QCoreApplication::applicationName());
-    qDebug() << "geometry" << restoreGeometry(settings.value("geometry").toByteArray());
-    qDebug() << "windowState" << restoreState(settings.value("windowState").toByteArray());
+    restoreGeometry(settings.value("geometry").toByteArray());
+    restoreState(settings.value("windowState").toByteArray());
 }
 
 void MainWindow::onTop(bool b)
@@ -218,6 +226,6 @@ void MainWindow::zoom1()
 
 void MainWindow::capture()
 {
-    path = QFileDialog::getExistingDirectory(this, "保存路径", path, QFileDialog::ShowDirsOnly |QFileDialog::DontResolveSymlinks);
+    path = QFileDialog::getExistingDirectory(this, "Save Path", path, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     label->pixmap()->save(path + "/" + QCoreApplication::applicationName() + ".png");
 }
